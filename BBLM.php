@@ -169,6 +169,7 @@ class BBLM {
     ];
     $this->property_styles_regex = '/[^a-zA-Z0-9:;\-_=\?\/\.\,\(\)]/';
     $this->blocks_tag = 'div';
+    $this->blocks_tag_protection = 'section';
     $this->blocks_separator = ';///;';
     $this->notation = [
       'block_styles' => [';##', '##;'],
@@ -561,6 +562,18 @@ class BBLM {
     $xpath = new DOMXPath($dom);
     $body = $dom->getElementsByTagName('body')->item(0);
     if ($hard_conversion) {
+      $from = $this->blocks_tag;
+      $to = $this->blocks_tag_protection;
+      foreach ($xpath->query('//'.$from) as $targetNode) {
+        $toNode = $dom->createElement($to);
+        foreach (iterator_to_array($targetNode->attributes) as $attr) {
+          $toNode->setAttribute($attr->name, $attr->value);
+        }
+        while ($targetNode->childNodes->length > 0) {
+          $toNode->appendChild($targetNode->childNodes->item(0));
+        }
+        $targetNode->parentNode->replaceChild($toNode, $targetNode);
+      }
       foreach ($xpath->query('/html/body/*') as $bodyChild) {
         if ($bodyChild->parentNode === $body AND $bodyChild->nodeType === XML_ELEMENT_NODE) {
           $tag = $bodyChild->nodeName;
