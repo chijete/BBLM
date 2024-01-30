@@ -4,7 +4,7 @@ require '../BBLM.php';
 
 $bblmInstance = new BBLM();
 
-echo $bblmInstance->BBLMtoHTML('
+echo $bblmInstance->BBLMtoPlainText('
 ;##ta:center##;;##fs:125px##;Hola ;+q+;mundo;+q+;;///;
 ;##c:rgba(223, 31, 31, 0.8)##;;_;i;_;Este;_;i;_; ;_;s;_;es;_;s;_; ;_;u;_;un;_;u;_; ;_;b;_;;#fs:25px#;;_;i;_;texto;_;i;_;;_;b;_;;///;
 ;##ff:sans-serif##;;##b:rgba(223, 31, 31, 0.8)##;;_;a;_;;~href:https://chijete.com/~;Hola mundo;_;a;_;;///;
@@ -21,6 +21,6 @@ echo $bblmInstance->BBLMtoHTML('
 ;_;tr;_;
 ;_;thead;_;
 ;_;table;_;
-', true);
+');
 
 ?>

@@ -14,6 +14,7 @@ class BBLM {
         ],
         'allowed_sites' => [
           'block' => true,
+          'entities' => true,
         ],
       ],
       'fs' => [
@@ -34,6 +35,8 @@ class BBLM {
           'sans-serif',
           'monospace',
           'arial',
+          'Liberation Serif',
+          'Impact',
         ],
         'allowed_sites' => [
           'block' => true,
@@ -65,12 +68,15 @@ class BBLM {
         'css' => 'height',
         'allowed_values' => [
           ['VALUE_TYPE_INT', 'px'],
+          ['VALUE_TYPE_INT', 'pt'],
+          ['VALUE_TYPE_INT', '%'],
         ],
         'allowed_sites' => [
           'entities' => [
             'img',
             'video',
-            'iframe'
+            'iframe',
+            'table'
           ],
         ],
       ],
@@ -78,12 +84,165 @@ class BBLM {
         'css' => 'width',
         'allowed_values' => [
           ['VALUE_TYPE_INT', 'px'],
+          ['VALUE_TYPE_INT', 'pt'],
+          ['VALUE_TYPE_INT', '%'],
         ],
         'allowed_sites' => [
           'entities' => [
             'img',
             'video',
-            'iframe'
+            'iframe',
+            'table'
+          ],
+        ],
+      ],
+      'd' => [
+        'css' => 'display',
+        'allowed_values' => [
+          'block',
+          'inline-block',
+          'inline',
+          'list-item'
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'listsp' => [
+        'css' => 'list-style-position',
+        'allowed_values' => [
+          'inside',
+          'outside'
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'listst' => [
+        'css' => 'list-style-type',
+        'allowed_values' => [
+          'disc',
+          'circle',
+          'square',
+          'decimal',
+          'georgian',
+          'revert',
+          'kannada'
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'ti' => [
+        'css' => 'text-indent',
+        'allowed_values' => [
+          ['VALUE_TYPE_INT', 'px'],
+          ['VALUE_TYPE_INT', 'pt'],
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'mnl' => [
+        'css' => 'margin-left',
+        'allowed_values' => [
+          ['VALUE_TYPE_INT', 'px'],
+          ['VALUE_TYPE_INT', 'pt'],
+          ['VALUE_TYPE_INT', '%'],
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'mnr' => [
+        'css' => 'margin-right',
+        'allowed_values' => [
+          ['VALUE_TYPE_INT', 'px'],
+          ['VALUE_TYPE_INT', 'pt'],
+          ['VALUE_TYPE_INT', '%'],
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'mnt' => [
+        'css' => 'margin-top',
+        'allowed_values' => [
+          ['VALUE_TYPE_INT', 'px'],
+          ['VALUE_TYPE_INT', 'pt'],
+          ['VALUE_TYPE_INT', '%'],
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'mnb' => [
+        'css' => 'margin-bottom',
+        'allowed_values' => [
+          ['VALUE_TYPE_INT', 'px'],
+          ['VALUE_TYPE_INT', 'pt'],
+          ['VALUE_TYPE_INT', '%'],
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'fw' => [
+        'css' => 'font-weight',
+        'allowed_values' => [
+          ['VALUE_TYPE_INT'],
+          ['normal'],
+          ['bold'],
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'fst' => [
+        'css' => 'font-style',
+        'allowed_values' => [
+          'normal',
+          'italic',
+          'oblique'
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'txd' => [
+        'css' => 'text-decoration',
+        'allowed_values' => [
+          'underline',
+          'overline',
+          'line-through',
+          'none'
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'tablely' => [
+        'css' => 'table-layout',
+        'allowed_values' => [
+          'auto',
+          'fixed',
+          'initial',
+          'inherit'
+        ],
+        'allowed_sites' => [
+          'entities' => [
+            'table'
           ],
         ],
       ],
@@ -100,6 +259,12 @@ class BBLM {
       ],
       'u' => [
         'html' => 'u',
+      ],
+      'sub' => [
+        'html' => 'sub',
+      ],
+      'sup' => [
+        'html' => 'sup',
       ],
       'a' => [
         'html' => 'a',
@@ -148,6 +313,24 @@ class BBLM {
       'span' => [
         'html' => 'span',
       ],
+      'h1' => [
+        'html' => 'h1',
+      ],
+      'h2' => [
+        'html' => 'h2',
+      ],
+      'h3' => [
+        'html' => 'h3',
+      ],
+      'h4' => [
+        'html' => 'h4',
+      ],
+      'h5' => [
+        'html' => 'h5',
+      ],
+      'h6' => [
+        'html' => 'h6',
+      ],
     ];
     $this->attributes = [
       'src' => [
@@ -167,20 +350,26 @@ class BBLM {
         ],
       ],
     ];
-    $this->property_styles_regex = '/[^a-zA-Z0-9:;\-_=\?\/\.\,\(\)]/';
+    $this->property_styles_regex = '/[^a-zA-Z0-9%\s:;\-_=\?\/\.\,\(\)]/';
     $this->blocks_tag = 'div';
-    $this->blocks_tag_protection = 'section';
+    $this->blocks_tag_protection = 'fake-block-div';
+    $this->html_blocks_tags = [
+      'section',
+      'p'
+    ];
     $this->blocks_separator = ';///;';
     $this->notation = [
       'block_styles' => [';##', '##;'],
       'entity' => ';_;',
       'entity_attributes' => [';~', '~;'],
       'entity_styles' => [';#', '#;'],
+      'nesting_index' => [';_#~', '~#_;'],
     ];
     $this->single_quote_code = ';+q+;';
     $this->hard_html_tags = [
       'strong' => 'b',
-      'em' => 'i'
+      'em' => 'i',
+      'bitbookcustomspan' => 'span'
     ];
     return true;
   }
@@ -194,12 +383,27 @@ class BBLM {
       $base_string = htmlentities($base_string);
     }
     $base_string = str_replace($this->single_quote_code, "'", $base_string);
+
+    $maxNestingIndex = false;
+    $base_string = preg_replace_callback('/'.$this->notation['nesting_index'][0].'(.*?)'.$this->notation['nesting_index'][1].'/', function($coincidence) use (&$maxNestingIndex) {
+      $contentText = $coincidence[1];
+      $contentInt = (int) trim($contentText);
+      if ($contentInt >= 0) {
+        $maxNestingIndex = $contentInt;
+      }
+      return '';
+    }, $base_string);
+    $maxNestingIndexForFor = 0;
+    if ($maxNestingIndex !== false) {
+      $maxNestingIndexForFor = $maxNestingIndex;
+    }
+
     $blocks = explode($this->blocks_separator, $base_string);
     foreach ($blocks as $block) {
       $block = trim($block);
       $block_css = [];
       $block = preg_replace_callback('/'.$this->notation['block_styles'][0].'(.*?)'.$this->notation['block_styles'][1].'/', function($coincidence) use (&$block_css) {
-        $propertyParts = explode(':', preg_replace($this->property_styles_regex, "", $coincidence[1]), 2);
+        $propertyParts = explode(':', trim(preg_replace($this->property_styles_regex, "", $coincidence[1])), 2);
         if (count($propertyParts) === 2) {
           if (isset($this->styles[$propertyParts[0]])) {
             if (isset($this->styles[$propertyParts[0]]['allowed_sites']['block'])) {
@@ -254,99 +458,106 @@ class BBLM {
         return '';
       }, $block);
       foreach ($this->entities as $entity => $entityData) {
-        $block = preg_replace_callback('/'.$this->notation['entity'].''.$entity.''.$this->notation['entity'].'(.*?)'.$this->notation['entity'].''.$entity.''.$this->notation['entity'].'/', function($coincidence) use ($entity, $entityData) {
-          $contentText = $coincidence[1];
-          $entity_attributes = [];
-          $entity_attributes_regex = $this->notation['entity_attributes'][0].'(.*?)'.$this->notation['entity_attributes'][1];
-          $contentText = preg_replace_callback('/(?:'.$this->notation['entity'].'.*'.$this->notation['entity'].'[^)]*'.$this->notation['entity'].'.*'.$this->notation['entity'].')(*SKIP)(*FAIL)|'.$entity_attributes_regex.'/', function($coincidence_i) use (&$entity_attributes, $entity) {
-            $propertyParts = explode(':', $coincidence_i[1], 2);
-            if (count($propertyParts) === 2) {
-              $propertyParts[0] = preg_replace("/[^a-zA-Z0-9]/", "", $propertyParts[0]);
-              if (isset($this->attributes[$propertyParts[0]])) {
-                if (in_array($entity, $this->attributes[$propertyParts[0]]['allowed_entities'])) {
-                  $entity_attributes[$this->attributes[$propertyParts[0]]['html']] = preg_replace($this->attributes[$propertyParts[0]]['regex_filter'], "", $propertyParts[1]);
+        for ($nestIndex=0; $nestIndex <= $maxNestingIndexForFor; $nestIndex++) {
+          if ($maxNestingIndex === false) {
+            $nestIndexI = '';
+          } else {
+            $nestIndexI = $nestIndex;
+          }
+          $block = preg_replace_callback('/'.$this->notation['entity'].''.$entity.$nestIndexI.''.$this->notation['entity'].'(.*?)'.$this->notation['entity'].''.$entity.$nestIndexI.''.$this->notation['entity'].'/', function($coincidence) use ($entity, $entityData) {
+            $contentText = $coincidence[1];
+            $entity_attributes = [];
+            $entity_attributes_regex = $this->notation['entity_attributes'][0].'(.*?)'.$this->notation['entity_attributes'][1];
+            $contentText = preg_replace_callback('/(?:'.$this->notation['entity'].'.*'.$this->notation['entity'].'[^)]*'.$this->notation['entity'].'.*'.$this->notation['entity'].')(*SKIP)(*FAIL)|'.$entity_attributes_regex.'/', function($coincidence_i) use (&$entity_attributes, $entity) {
+              $propertyParts = explode(':', $coincidence_i[1], 2);
+              if (count($propertyParts) === 2) {
+                $propertyParts[0] = preg_replace("/[^a-zA-Z0-9]/", "", $propertyParts[0]);
+                if (isset($this->attributes[$propertyParts[0]])) {
+                  if (in_array($entity, $this->attributes[$propertyParts[0]]['allowed_entities'])) {
+                    $entity_attributes[$this->attributes[$propertyParts[0]]['html']] = preg_replace($this->attributes[$propertyParts[0]]['regex_filter'], "", $propertyParts[1]);
+                  }
                 }
               }
-            }
-            return '';
-          }, $contentText);
-          $entity_css = [];
-          $entity_styles_regex = $this->notation['entity_styles'][0].'(.*?)'.$this->notation['entity_styles'][1];
-          $contentText = preg_replace_callback('/(?:'.$this->notation['entity'].'.*'.$this->notation['entity'].'[^)]*'.$this->notation['entity'].'.*'.$this->notation['entity'].')(*SKIP)(*FAIL)|'.$entity_styles_regex.'/', function($coincidence_i) use (&$entity_css, $entity) {
-            $propertyParts = explode(':', preg_replace($this->property_styles_regex, "", $coincidence_i[1]), 2);
-            if (count($propertyParts) === 2) {
-              if (isset($this->styles[$propertyParts[0]])) {
-                if (isset($this->styles[$propertyParts[0]]['allowed_sites']['entities'])) {
-                  $accessGranted = false;
-                  if (is_array($this->styles[$propertyParts[0]]['allowed_sites']['entities'])) {
-                    if (in_array($entity, $this->styles[$propertyParts[0]]['allowed_sites']['entities'])) {
+              return '';
+            }, $contentText);
+            $entity_css = [];
+            $entity_styles_regex = $this->notation['entity_styles'][0].'(.*?)'.$this->notation['entity_styles'][1];
+            $contentText = preg_replace_callback('/(?:'.$this->notation['entity'].'.*'.$this->notation['entity'].'[^)]*'.$this->notation['entity'].'.*'.$this->notation['entity'].')(*SKIP)(*FAIL)|'.$entity_styles_regex.'/', function($coincidence_i) use (&$entity_css, $entity) {
+              $propertyParts = explode(':', trim(preg_replace($this->property_styles_regex, "", $coincidence_i[1])), 2);
+              if (count($propertyParts) === 2) {
+                if (isset($this->styles[$propertyParts[0]])) {
+                  if (isset($this->styles[$propertyParts[0]]['allowed_sites']['entities'])) {
+                    $accessGranted = false;
+                    if (is_array($this->styles[$propertyParts[0]]['allowed_sites']['entities'])) {
+                      if (in_array($entity, $this->styles[$propertyParts[0]]['allowed_sites']['entities'])) {
+                        $accessGranted = true;
+                      }
+                    } elseif ($this->styles[$propertyParts[0]]['allowed_sites']['entities']) {
                       $accessGranted = true;
                     }
-                  } elseif ($this->styles[$propertyParts[0]]['allowed_sites']['entities']) {
-                    $accessGranted = true;
-                  }
-                  if ($accessGranted) {
-                    $allowedValue = false;
-                    if (is_string($this->styles[$propertyParts[0]]['allowed_values'])) {
-                      if (preg_match($this->styles[$propertyParts[0]]['allowed_values'], $propertyParts[1])) {
-                        $allowedValue = true;
-                      }
-                    } elseif (is_array($this->styles[$propertyParts[0]]['allowed_values'][0])) {
-                      foreach ($this->styles[$propertyParts[0]]['allowed_values'] as $allowedValArr) {
-                        if (count($allowedValArr) === 1) {
-                          if ($allowedValArr[0] == 'VALUE_TYPE_INT') {
-                            if (is_numeric($propertyParts[1])) {
-                              $allowedValue = true;
-                            }
-                          } else {
-                            if ($propertyParts[1] === $allowedValArr[0]) {
-                              $allowedValue = true;
-                            }
-                          }
-                        } elseif (count($allowedValArr) === 2) {
-                          $propValFirstPart = str_replace($allowedValArr[1], '', $propertyParts[1]);
-                          $propValSecondPart = mb_substr($propertyParts[1], 0 - mb_strlen($allowedValArr[1]));
-                          if ($propValSecondPart === $allowedValArr[1]) {
+                    if ($accessGranted) {
+                      $allowedValue = false;
+                      if (is_string($this->styles[$propertyParts[0]]['allowed_values'])) {
+                        if (preg_match($this->styles[$propertyParts[0]]['allowed_values'], $propertyParts[1])) {
+                          $allowedValue = true;
+                        }
+                      } elseif (is_array($this->styles[$propertyParts[0]]['allowed_values'][0])) {
+                        foreach ($this->styles[$propertyParts[0]]['allowed_values'] as $allowedValArr) {
+                          if (count($allowedValArr) === 1) {
                             if ($allowedValArr[0] == 'VALUE_TYPE_INT') {
-                              if (is_numeric($propValFirstPart)) {
+                              if (is_numeric($propertyParts[1])) {
                                 $allowedValue = true;
                               }
                             } else {
-                              if ($propValFirstPart === $allowedValArr[0]) {
+                              if ($propertyParts[1] === $allowedValArr[0]) {
                                 $allowedValue = true;
+                              }
+                            }
+                          } elseif (count($allowedValArr) === 2) {
+                            $propValFirstPart = str_replace($allowedValArr[1], '', $propertyParts[1]);
+                            $propValSecondPart = mb_substr($propertyParts[1], 0 - mb_strlen($allowedValArr[1]));
+                            if ($propValSecondPart === $allowedValArr[1]) {
+                              if ($allowedValArr[0] == 'VALUE_TYPE_INT') {
+                                if (is_numeric($propValFirstPart)) {
+                                  $allowedValue = true;
+                                }
+                              } else {
+                                if ($propValFirstPart === $allowedValArr[0]) {
+                                  $allowedValue = true;
+                                }
                               }
                             }
                           }
                         }
+                      } elseif (in_array($propertyParts[1], $this->styles[$propertyParts[0]]['allowed_values'])) {
+                        $allowedValue = true;
                       }
-                    } elseif (in_array($propertyParts[1], $this->styles[$propertyParts[0]]['allowed_values'])) {
-                      $allowedValue = true;
-                    }
-                    if ($allowedValue) {
-                      $entity_css[$this->styles[$propertyParts[0]]['css']] = $propertyParts[1];
+                      if ($allowedValue) {
+                        $entity_css[$this->styles[$propertyParts[0]]['css']] = $propertyParts[1];
+                      }
                     }
                   }
                 }
               }
+              return '';
+            }, $contentText);
+            $entity_css_str = '';
+            foreach ($entity_css as $property => $value) {
+              $entity_css_str .= "$property: $value; ";
             }
-            return '';
-          }, $contentText);
-          $entity_css_str = '';
-          foreach ($entity_css as $property => $value) {
-            $entity_css_str .= "$property: $value; ";
-          }
-          $entity_css_str = trim($entity_css_str);
-          $style_attr_html = '';
-          if (!empty($entity_css_str)) {
-            $style_attr_html = 'style="'.$entity_css_str.'"';
-          }
-          $entity_attributes_str = '';
-          foreach ($entity_attributes as $attribute => $value) {
-            $entity_attributes_str .= "$attribute=\"$value\" ";
-          }
-          $entity_attributes_str = trim($entity_attributes_str);
-          return '<'.$entityData['html'].' '.$style_attr_html.' '.$entity_attributes_str.'>' . $contentText . '</'.$entityData['html'].'>';
-        }, $block);
+            $entity_css_str = trim($entity_css_str);
+            $style_attr_html = '';
+            if (!empty($entity_css_str)) {
+              $style_attr_html = 'style="'.$entity_css_str.'"';
+            }
+            $entity_attributes_str = '';
+            foreach ($entity_attributes as $attribute => $value) {
+              $entity_attributes_str .= "$attribute=\"$value\" ";
+            }
+            $entity_attributes_str = trim($entity_attributes_str);
+            return '<'.$entityData['html'].' '.$style_attr_html.' '.$entity_attributes_str.'>' . $contentText . '</'.$entityData['html'].'>';
+          }, $block);
+        }
       }
       $block_css_str = '';
       foreach ($block_css as $property => $value) {
@@ -362,11 +573,30 @@ class BBLM {
     return $final_html;
   }
 
-  public function BBLMtoPlainText($base_string, $delete_breaklines = false) {
+  public function BBLMtoPlainText($base_string, $delete_breaklines = true, $e_htmlentities = true) {
     $final_text = '';
     if ($delete_breaklines) {
       $base_string = preg_replace("/[\r\n]/", '', $base_string);
     }
+    if ($e_htmlentities) {
+      $base_string = htmlentities($base_string);
+    }
+    $base_string = str_replace($this->single_quote_code, "'", $base_string);
+
+    $maxNestingIndex = false;
+    $base_string = preg_replace_callback('/'.$this->notation['nesting_index'][0].'(.*?)'.$this->notation['nesting_index'][1].'/', function($coincidence) use (&$maxNestingIndex) {
+      $contentText = $coincidence[1];
+      $contentInt = (int) trim($contentText);
+      if ($contentInt >= 0) {
+        $maxNestingIndex = $contentInt;
+      }
+      return '';
+    }, $base_string);
+    $maxNestingIndexForFor = 0;
+    if ($maxNestingIndex !== false) {
+      $maxNestingIndexForFor = $maxNestingIndex;
+    }
+
     $blocks = explode(';///;', $base_string);
     foreach ($blocks as $block) {
       $block = trim($block);
@@ -374,16 +604,23 @@ class BBLM {
         return '';
       }, $block);
       foreach ($this->entities as $entity => $entityData) {
-        $block = preg_replace_callback('/'.$this->notation['entity'].''.$entity.''.$this->notation['entity'].'(.*?)'.$this->notation['entity'].''.$entity.''.$this->notation['entity'].'/', function($coincidence) use ($entity, $entityData) {
-          $contentText = $coincidence[1];
-          $contentText = preg_replace_callback('/'.$this->notation['entity_attributes'][0].'(.*?)'.$this->notation['entity_attributes'][1].'/', function($coincidence_i) {
-            return '';
-          }, $contentText);
-          $contentText = preg_replace_callback('/'.$this->notation['entity_styles'][0].'(.*?)'.$this->notation['entity_styles'][1].'/', function($coincidence_i) {
-            return '';
-          }, $contentText);
-          return $contentText;
-        }, $block);
+        for ($nestIndex=0; $nestIndex <= $maxNestingIndexForFor; $nestIndex++) {
+          if ($maxNestingIndex === false) {
+            $nestIndexI = '';
+          } else {
+            $nestIndexI = $nestIndex;
+          }
+          $block = preg_replace_callback('/'.$this->notation['entity'].''.$entity.$nestIndexI.''.$this->notation['entity'].'(.*?)'.$this->notation['entity'].''.$entity.$nestIndexI.''.$this->notation['entity'].'/', function($coincidence) use ($entity, $entityData) {
+            $contentText = $coincidence[1];
+            $contentText = preg_replace_callback('/'.$this->notation['entity_attributes'][0].'(.*?)'.$this->notation['entity_attributes'][1].'/', function($coincidence_i) {
+              return '';
+            }, $contentText);
+            $contentText = preg_replace_callback('/'.$this->notation['entity_styles'][0].'(.*?)'.$this->notation['entity_styles'][1].'/', function($coincidence_i) {
+              return '';
+            }, $contentText);
+            return $contentText;
+          }, $block);
+        }
       }
       $final_text .= $block . PHP_EOL;
     }
@@ -438,7 +675,7 @@ class BBLM {
 
   function convertRGBtoRGBA($colorRGB) {
     $colorRGB = trim($colorRGB);
-    $patron = '/rgb\((\d{1,3}), (\d{1,3}), (\d{1,3})\)/';
+    $patron = '/rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)/';
     if (preg_match($patron, $colorRGB)) {
       $colorRGB = 'rgba' . mb_substr($colorRGB, 3);
       $colorRGB = mb_substr($colorRGB, 0, -1) . ', 1)';
@@ -542,7 +779,16 @@ class BBLM {
     return $innerHTML;
   }
 
-  public function HTMLtoBBLM($base_string, $hard_conversion = false) {
+  function obtenerIndiceAnidacion($elemento) {
+    $indice = 0;
+    while ($elemento->parentNode && $elemento->parentNode->nodeName !== 'body') {
+        $elemento = $elemento->parentNode;
+        $indice++;
+    }
+    return $indice;
+  }
+
+  public function HTMLtoBBLM($base_string, $hard_conversion = true) {
     $final_bblm = '';
 
     $bblm_blocks = [];
@@ -562,20 +808,25 @@ class BBLM {
     $xpath = new DOMXPath($dom);
     $body = $dom->getElementsByTagName('body')->item(0);
     if ($hard_conversion) {
-      $from = $this->blocks_tag;
-      $to = $this->blocks_tag_protection;
-      foreach ($xpath->query('//'.$from) as $targetNode) {
-        $toNode = $dom->createElement($to);
-        foreach (iterator_to_array($targetNode->attributes) as $attr) {
-          $toNode->setAttribute($attr->name, $attr->value);
+      foreach ($this->html_blocks_tags as $from) {
+        $to = $this->blocks_tag;
+        foreach ($xpath->query('//'.$from) as $targetNode) {
+          $toNode = $dom->createElement($to);
+          foreach (iterator_to_array($targetNode->attributes) as $attr) {
+            $toNode->setAttribute($attr->name, $attr->value);
+          }
+          while ($targetNode->childNodes->length > 0) {
+            $toNode->appendChild($targetNode->childNodes->item(0));
+          }
+          $targetNode->parentNode->replaceChild($toNode, $targetNode);
         }
-        while ($targetNode->childNodes->length > 0) {
-          $toNode->appendChild($targetNode->childNodes->item(0));
-        }
-        $targetNode->parentNode->replaceChild($toNode, $targetNode);
       }
       foreach ($xpath->query('/html/body/*') as $bodyChild) {
-        if ($bodyChild->parentNode === $body AND $bodyChild->nodeType === XML_ELEMENT_NODE) {
+        if (
+          $bodyChild->parentNode === $body AND
+          $bodyChild->nodeType === XML_ELEMENT_NODE AND
+          $bodyChild->nodeName != $this->blocks_tag
+        ) {
           $tag = $bodyChild->nodeName;
           $attrs = $bodyChild->attributes;
           $init_tag = '<'.$tag;
@@ -590,6 +841,22 @@ class BBLM {
           $tpl->loadHtml('<?xml encoding="UTF-8"><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $init_tag . $bodyChildHTML . $end_tag . '</body></html>');
           $nuevoDiv->appendChild($dom->importNode($tpl->getElementsByTagName('body')->item(0)->firstChild, TRUE));
           $bodyChild->parentNode->replaceChild($nuevoDiv, $bodyChild);
+        }
+      }
+      foreach ($xpath->query('//div//div') as $targetNode) {
+        if ($targetNode->nodeType === XML_ELEMENT_NODE) {
+          $targetNodeStyle = $targetNode->getAttribute('style');
+          $ultimoDivPadre = $xpath->query('ancestor::div[last()]', $targetNode)->item(0);
+          $ultimoDivPadreStyle = $ultimoDivPadre->getAttribute('style');
+          $ultimoDivPadre->setAttribute('style', trim($ultimoDivPadreStyle . ' ' . $targetNodeStyle));
+          $toNode = $dom->createElement($this->blocks_tag_protection);
+          foreach (iterator_to_array($targetNode->attributes) as $attr) {
+            $toNode->setAttribute($attr->name, $attr->value);
+          }
+          while ($targetNode->childNodes->length > 0) {
+            $toNode->appendChild($targetNode->childNodes->item(0));
+          }
+          $targetNode->parentNode->replaceChild($toNode, $targetNode);
         }
       }
       foreach ($this->hard_html_tags as $from => $to) {
@@ -626,12 +893,44 @@ class BBLM {
       }
     }
 
+    $elementosBodyWithIndiceAnidacion = [];
+    $elementosBody = $xpath->query('//body//*');
+    foreach ($elementosBody as $elemento) {
+      if ($elemento->nodeType === XML_ELEMENT_NODE) {
+        if ($elemento->nodeName !== $this->blocks_tag) {
+          $indiceAnidacion = $this->obtenerIndiceAnidacion($elemento);
+          $elementosBodyWithIndiceAnidacion[] = [
+            'elemento' => $elemento,
+            'indiceAnidacion' => $indiceAnidacion
+          ];
+        }
+      }
+    }
+    usort($elementosBodyWithIndiceAnidacion, function ($a, $b) {
+      return $b['indiceAnidacion'] - $a['indiceAnidacion'];
+    });
+    $maxIndiceAnidacion = $elementosBodyWithIndiceAnidacion[0]['indiceAnidacion'];
+    foreach ($elementosBodyWithIndiceAnidacion as $elementoData) {
+      $elemento = $elementoData['elemento'];
+      $indiceAnidacion = $elementoData['indiceAnidacion'];
+      $elementoInnerHTML = $this->DOMinnerHTML($elemento);
+      $customChildElement = $dom->createElement($elemento->nodeName . $indiceAnidacion);
+      $elemento->parentNode->replaceChild($customChildElement, $elemento);
+      if (!empty($elementoInnerHTML)) {
+        $fragmento = $dom->createDocumentFragment();
+        $fragmento->appendXML($elementoInnerHTML);
+        $customChildElement->appendChild($fragmento);
+      }
+    }
+
     $htmlResult = $dom->saveHTML();
     foreach ($this->entities as $bblmTag => $tagData) {
-      $htmlResult = str_replace('<'.$tagData['html'].'>', $this->notation['entity'] . $bblmTag . $this->notation['entity'], $htmlResult);
-      $htmlResult = str_replace('</'.$tagData['html'].'>', $this->notation['entity'] . $bblmTag . $this->notation['entity'], $htmlResult);
-      $htmlResult = str_replace('<temp-'.$tagData['html'].'>', $this->notation['entity'] . $bblmTag . $this->notation['entity'], $htmlResult);
-      $htmlResult = str_replace('</temp-'.$tagData['html'].'>', $this->notation['entity'] . $bblmTag . $this->notation['entity'], $htmlResult);
+      for ($iui=0; $iui <= $maxIndiceAnidacion; $iui++) {
+        $htmlResult = str_replace('<'.$tagData['html'].$iui.'>', $this->notation['entity'] . $bblmTag.$iui . $this->notation['entity'], $htmlResult);
+        $htmlResult = str_replace('</'.$tagData['html'].$iui.'>', $this->notation['entity'] . $bblmTag.$iui . $this->notation['entity'], $htmlResult);
+        $htmlResult = str_replace('<temp-'.$tagData['html'].$iui.'>', $this->notation['entity'] . $bblmTag.$iui . $this->notation['entity'], $htmlResult);
+        $htmlResult = str_replace('</temp-'.$tagData['html'].$iui.'>', $this->notation['entity'] . $bblmTag.$iui . $this->notation['entity'], $htmlResult);
+      }
     }
 
     $dom = new DOMDocument('1.0', 'UTF-8');
@@ -642,7 +941,7 @@ class BBLM {
       $bblm_blocks[] = str_replace("'", $this->single_quote_code, strip_tags($div->nodeValue));
     }
 
-    $final_bblm = implode($this->blocks_separator, $bblm_blocks);
+    $final_bblm = $this->notation['nesting_index'][0] . $maxIndiceAnidacion . $this->notation['nesting_index'][1] . implode($this->blocks_separator, $bblm_blocks);
 
     return $final_bblm;
   }
