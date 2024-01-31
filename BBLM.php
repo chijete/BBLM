@@ -409,6 +409,9 @@ class BBLM {
         'html' => 'br',
         'autoclose' => true,
       ],
+      'bblmpb' => [ // page break
+        'html' => 'bblmpb',
+      ],
     ];
     $this->attributes = [
       'src' => [
@@ -449,6 +452,11 @@ class BBLM {
       'strong' => 'b',
       'em' => 'i',
       'bitbookcustomspan' => 'span'
+    ];
+    // These tags and their content will be completely removed in HTMLtoBBLM()
+    $this->hard_tags_delete = [
+      'style',
+      'script'
     ];
     return true;
   }
@@ -1007,6 +1015,13 @@ class BBLM {
             $toNode->appendChild($targetNode->childNodes->item(0));
           }
           $targetNode->parentNode->replaceChild($toNode, $targetNode);
+        }
+      }
+      foreach ($this->hard_tags_delete as $toDeleteTag) {
+        foreach ($xpath->query('//'.$toDeleteTag) as $targetNode) {
+          if ($targetNode->nodeType === XML_ELEMENT_NODE) {
+            $targetNode->parentNode->removeChild($targetNode);
+          }
         }
       }
     }

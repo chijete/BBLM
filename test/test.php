@@ -52,15 +52,14 @@ $htmlString = '
   <li>🧤🧤</li>
 </ul>
 
+<bblmpb></bblmpb>
+
   </body>
 </html>
 ';
 
 // $htmlString = '
-// <b>Hola, mundo</b>
-// <ul>
-//   <li>Hola</li>
-// </ul>
+// <p>Hola</p>
 // ';
 
 $bblmFromHTML = $bblmInstance->HTMLtoBBLM($htmlString, true);
