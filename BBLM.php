@@ -21,6 +21,8 @@ class BBLM {
         'css' => 'font-size',
         'allowed_values' => [
           ['VALUE_TYPE_INT', 'px'],
+          ['VALUE_TYPE_INT', 'pt'],
+          ['VALUE_TYPE_INT', 'cm'],
           ['VALUE_TYPE_INT', 'em'],
         ],
         'allowed_sites' => [
@@ -30,14 +32,7 @@ class BBLM {
       ],
       'ff' => [
         'css' => 'font-family',
-        'allowed_values' => [
-          'serif',
-          'sans-serif',
-          'monospace',
-          'arial',
-          'Liberation Serif',
-          'Impact',
-        ],
+        'allowed_values' => '/^[a-zA-Z0-9\s\'"\-\,]+$/',
         'allowed_sites' => [
           'block' => true,
           'entities' => true,
@@ -64,12 +59,33 @@ class BBLM {
         ],
         'is_rgba' => true,
       ],
+      'bc' => [
+        'css' => 'border-color',
+        'allowed_values' => '/^rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*(1|0?\.\d+)\s*\)$/',
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+        'is_rgba' => true,
+      ],
       'ht' => [
         'css' => 'height',
         'allowed_values' => [
           ['VALUE_TYPE_INT', 'px'],
           ['VALUE_TYPE_INT', 'pt'],
           ['VALUE_TYPE_INT', '%'],
+          ['VALUE_TYPE_INT'],
+        ],
+        // Concatenates a string to the end or beginning of the CSS property value.
+        // Example: "height: 30;" -> "height: 30px;"
+        'allowed_values_conc' => [
+          false,
+          false,
+          false,
+          [
+            'str' => 'px',
+            'pos' => 'suffix'
+          ]
         ],
         'allowed_sites' => [
           'entities' => [
@@ -86,6 +102,16 @@ class BBLM {
           ['VALUE_TYPE_INT', 'px'],
           ['VALUE_TYPE_INT', 'pt'],
           ['VALUE_TYPE_INT', '%'],
+          ['VALUE_TYPE_INT'],
+        ],
+        'allowed_values_conc' => [
+          false,
+          false,
+          false,
+          [
+            'str' => 'px',
+            'pos' => 'suffix'
+          ]
         ],
         'allowed_sites' => [
           'entities' => [
@@ -153,6 +179,7 @@ class BBLM {
           ['VALUE_TYPE_INT', 'px'],
           ['VALUE_TYPE_INT', 'pt'],
           ['VALUE_TYPE_INT', '%'],
+          ['auto'],
         ],
         'allowed_sites' => [
           'block' => true,
@@ -165,6 +192,7 @@ class BBLM {
           ['VALUE_TYPE_INT', 'px'],
           ['VALUE_TYPE_INT', 'pt'],
           ['VALUE_TYPE_INT', '%'],
+          ['auto'],
         ],
         'allowed_sites' => [
           'block' => true,
@@ -177,6 +205,7 @@ class BBLM {
           ['VALUE_TYPE_INT', 'px'],
           ['VALUE_TYPE_INT', 'pt'],
           ['VALUE_TYPE_INT', '%'],
+          ['auto'],
         ],
         'allowed_sites' => [
           'block' => true,
@@ -189,6 +218,7 @@ class BBLM {
           ['VALUE_TYPE_INT', 'px'],
           ['VALUE_TYPE_INT', 'pt'],
           ['VALUE_TYPE_INT', '%'],
+          ['auto'],
         ],
         'allowed_sites' => [
           'block' => true,
@@ -246,6 +276,44 @@ class BBLM {
           ],
         ],
       ],
+      'bcll' => [
+        'css' => 'border-collapse',
+        'allowed_values' => [
+          'collapse',
+          'separate',
+          'inherit',
+          'initial'
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+      'va' => [
+        'css' => 'vertical-align',
+        'allowed_values' => [
+          'baseline',
+          'sub',
+          'super',
+          'text-top',
+          'text-bottom',
+          'middle',
+          'top',
+          'bottom',
+          'inherit',
+          'initial'
+        ],
+        'allowed_sites' => [
+          'block' => true,
+          'entities' => true,
+        ],
+      ],
+    ];
+    // In HTMLtoBBLM, this attributes will be added to style attribute in all DOM elements.
+    $this->styles_as_attributes = [
+      // {attribute} => {css_property}
+      'width' => 'width',
+      'height' => 'height',
     ];
     $this->entities = [
       'b' => [
@@ -331,6 +399,16 @@ class BBLM {
       'h6' => [
         'html' => 'h6',
       ],
+      'blockquote' => [
+        'html' => 'blockquote',
+      ],
+      'pre' => [
+        'html' => 'pre',
+      ],
+      'br' => [
+        'html' => 'br',
+        'autoclose' => true,
+      ],
     ];
     $this->attributes = [
       'src' => [
@@ -353,6 +431,7 @@ class BBLM {
     $this->property_styles_regex = '/[^a-zA-Z0-9%\s:;\-_=\?\/\.\,\(\)]/';
     $this->blocks_tag = 'div';
     $this->blocks_tag_protection = 'fake-block-div';
+    // Equivalent to div (also blocks_tags)
     $this->html_blocks_tags = [
       'section',
       'p'
@@ -380,7 +459,7 @@ class BBLM {
       $base_string = preg_replace("/[\r\n]/", '', $base_string);
     }
     if ($e_htmlentities) {
-      $base_string = htmlentities($base_string);
+      $base_string = htmlentities($base_string, ENT_COMPAT | ENT_HTML401, ini_get("default_charset"), false);
     }
     $base_string = str_replace($this->single_quote_code, "'", $base_string);
 
@@ -412,13 +491,14 @@ class BBLM {
                 $accessGranted = true;
               }
               if ($accessGranted) {
+                $finalCssPropertyContent = $propertyParts[1];
                 $allowedValue = false;
                 if (is_string($this->styles[$propertyParts[0]]['allowed_values'])) {
                   if (preg_match($this->styles[$propertyParts[0]]['allowed_values'], $propertyParts[1])) {
                     $allowedValue = true;
                   }
                 } elseif (is_array($this->styles[$propertyParts[0]]['allowed_values'][0])) {
-                  foreach ($this->styles[$propertyParts[0]]['allowed_values'] as $allowedValArr) {
+                  foreach ($this->styles[$propertyParts[0]]['allowed_values'] as $allowedValArrIndex => $allowedValArr) {
                     if (count($allowedValArr) === 1) {
                       if ($allowedValArr[0] == 'VALUE_TYPE_INT') {
                         if (is_numeric($propertyParts[1])) {
@@ -444,12 +524,26 @@ class BBLM {
                         }
                       }
                     }
+                    if (isset($this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]) AND $this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex] !== false) {
+                      if ($this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]['pos'] === 'prefix') {
+                        $finalCssPropertyContent = $this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]['str'] . $finalCssPropertyContent;
+                      } elseif ($this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]['pos'] === 'suffix') {
+                        $finalCssPropertyContent = $finalCssPropertyContent . $this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]['str'];
+                      }
+                    }
                   }
                 } elseif (in_array($propertyParts[1], $this->styles[$propertyParts[0]]['allowed_values'])) {
                   $allowedValue = true;
                 }
+                if (isset($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'])) {
+                  if ($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'] === 'prefix') {
+                    $finalCssPropertyContent = $this->styles[$propertyParts[0]]['allowed_values_conc']['str'] . $finalCssPropertyContent;
+                  } elseif ($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'] === 'suffix') {
+                    $finalCssPropertyContent = $finalCssPropertyContent . $this->styles[$propertyParts[0]]['allowed_values_conc']['str'];
+                  }
+                }
                 if ($allowedValue) {
-                  $block_css[$this->styles[$propertyParts[0]]['css']] = $propertyParts[1];
+                  $block_css[$this->styles[$propertyParts[0]]['css']] = $finalCssPropertyContent;
                 }
               }
             }
@@ -496,13 +590,14 @@ class BBLM {
                       $accessGranted = true;
                     }
                     if ($accessGranted) {
+                      $finalCssPropertyContent = $propertyParts[1];
                       $allowedValue = false;
                       if (is_string($this->styles[$propertyParts[0]]['allowed_values'])) {
                         if (preg_match($this->styles[$propertyParts[0]]['allowed_values'], $propertyParts[1])) {
                           $allowedValue = true;
                         }
                       } elseif (is_array($this->styles[$propertyParts[0]]['allowed_values'][0])) {
-                        foreach ($this->styles[$propertyParts[0]]['allowed_values'] as $allowedValArr) {
+                        foreach ($this->styles[$propertyParts[0]]['allowed_values'] as $allowedValArrIndex => $allowedValArr) {
                           if (count($allowedValArr) === 1) {
                             if ($allowedValArr[0] == 'VALUE_TYPE_INT') {
                               if (is_numeric($propertyParts[1])) {
@@ -528,12 +623,26 @@ class BBLM {
                               }
                             }
                           }
+                          if (isset($this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]) AND $this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex] !== false) {
+                            if ($this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]['pos'] === 'prefix') {
+                              $finalCssPropertyContent = $this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]['str'] . $finalCssPropertyContent;
+                            } elseif ($this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]['pos'] === 'suffix') {
+                              $finalCssPropertyContent = $finalCssPropertyContent . $this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]['str'];
+                            }
+                          }
                         }
                       } elseif (in_array($propertyParts[1], $this->styles[$propertyParts[0]]['allowed_values'])) {
                         $allowedValue = true;
                       }
+                      if (isset($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'])) {
+                        if ($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'] === 'prefix') {
+                          $finalCssPropertyContent = $this->styles[$propertyParts[0]]['allowed_values_conc']['str'] . $finalCssPropertyContent;
+                        } elseif ($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'] === 'suffix') {
+                          $finalCssPropertyContent = $finalCssPropertyContent . $this->styles[$propertyParts[0]]['allowed_values_conc']['str'];
+                        }
+                      }
                       if ($allowedValue) {
-                        $entity_css[$this->styles[$propertyParts[0]]['css']] = $propertyParts[1];
+                        $entity_css[$this->styles[$propertyParts[0]]['css']] = $finalCssPropertyContent;
                       }
                     }
                   }
@@ -555,7 +664,17 @@ class BBLM {
               $entity_attributes_str .= "$attribute=\"$value\" ";
             }
             $entity_attributes_str = trim($entity_attributes_str);
-            return '<'.$entityData['html'].' '.$style_attr_html.' '.$entity_attributes_str.'>' . $contentText . '</'.$entityData['html'].'>';
+            $entity_complete_html = '<'.$entityData['html'].' '.$style_attr_html.' '.$entity_attributes_str.'>';
+            $add_the_end_html = true;
+            if (isset($entityData['autoclose']) AND $entityData['autoclose']) {
+              if (empty(trim($contentText))) {
+                $add_the_end_html = false;
+              }
+            }
+            if ($add_the_end_html) {
+              $entity_complete_html .= $contentText . '</'.$entityData['html'].'>';
+            }
+            return $entity_complete_html;
           }, $block);
         }
       }
@@ -579,7 +698,7 @@ class BBLM {
       $base_string = preg_replace("/[\r\n]/", '', $base_string);
     }
     if ($e_htmlentities) {
-      $base_string = htmlentities($base_string);
+      $base_string = htmlentities($base_string, ENT_COMPAT | ENT_HTML401, ini_get("default_charset"), false);
     }
     $base_string = str_replace($this->single_quote_code, "'", $base_string);
 
@@ -821,6 +940,25 @@ class BBLM {
           $targetNode->parentNode->replaceChild($toNode, $targetNode);
         }
       }
+      foreach ($xpath->query('//body//*') as $domElement) {
+        if ($domElement->nodeType === XML_ELEMENT_NODE) {
+          $addStyles = [];
+          foreach ($this->styles_as_attributes as $attrName => $cssProperty) {
+            $domElementAttrVal = $domElement->getAttribute($attrName);
+            if (!empty($domElementAttrVal)) {
+              $addStyles[$cssProperty] = $domElementAttrVal;
+            }
+          }
+          if (!empty($addStyles)) {
+            $domElementNewStyle = "";
+            foreach ($addStyles as $cssProperty => $propertyValue) {
+              $domElementNewStyle .= ' ' . $cssProperty . ': ' . $propertyValue . ';';
+            }
+            $domElementCurrStyle = $domElement->getAttribute('style');
+            $domElement->setAttribute('style', trim($domElementCurrStyle . $domElementNewStyle));
+          }
+        }
+      }
       foreach ($xpath->query('/html/body/*') as $bodyChild) {
         if (
           $bodyChild->parentNode === $body AND
@@ -893,6 +1031,7 @@ class BBLM {
       }
     }
 
+    $maxIndiceAnidacion = 0;
     $elementosBodyWithIndiceAnidacion = [];
     $elementosBody = $xpath->query('//body//*');
     foreach ($elementosBody as $elemento) {
@@ -906,20 +1045,22 @@ class BBLM {
         }
       }
     }
-    usort($elementosBodyWithIndiceAnidacion, function ($a, $b) {
-      return $b['indiceAnidacion'] - $a['indiceAnidacion'];
-    });
-    $maxIndiceAnidacion = $elementosBodyWithIndiceAnidacion[0]['indiceAnidacion'];
-    foreach ($elementosBodyWithIndiceAnidacion as $elementoData) {
-      $elemento = $elementoData['elemento'];
-      $indiceAnidacion = $elementoData['indiceAnidacion'];
-      $elementoInnerHTML = $this->DOMinnerHTML($elemento);
-      $customChildElement = $dom->createElement($elemento->nodeName . $indiceAnidacion);
-      $elemento->parentNode->replaceChild($customChildElement, $elemento);
-      if (!empty($elementoInnerHTML)) {
-        $fragmento = $dom->createDocumentFragment();
-        $fragmento->appendXML($elementoInnerHTML);
-        $customChildElement->appendChild($fragmento);
+    if (!empty($elementosBodyWithIndiceAnidacion)) {
+      usort($elementosBodyWithIndiceAnidacion, function ($a, $b) {
+        return $b['indiceAnidacion'] - $a['indiceAnidacion'];
+      });
+      $maxIndiceAnidacion = $elementosBodyWithIndiceAnidacion[0]['indiceAnidacion'];
+      foreach ($elementosBodyWithIndiceAnidacion as $elementoData) {
+        $elemento = $elementoData['elemento'];
+        $indiceAnidacion = $elementoData['indiceAnidacion'];
+        $elementoInnerHTML = $this->DOMinnerHTML($elemento);
+        $customChildElement = $dom->createElement($elemento->nodeName . $indiceAnidacion);
+        $elemento->parentNode->replaceChild($customChildElement, $elemento);
+        if (!empty($elementoInnerHTML)) {
+          $fragmento = $dom->createDocumentFragment();
+          $fragmento->appendXML($elementoInnerHTML);
+          $customChildElement->appendChild($fragmento);
+        }
       }
     }
 
@@ -938,7 +1079,7 @@ class BBLM {
     $body = $dom->getElementsByTagName('body')->item(0);
     $divs = $body->getElementsByTagName($this->blocks_tag);
     foreach ($divs as $div) {
-      $bblm_blocks[] = str_replace("'", $this->single_quote_code, strip_tags($div->nodeValue));
+      $bblm_blocks[] = str_replace("'", $this->single_quote_code, strip_tags($this->DOMinnerHTML($div)));
     }
 
     $final_bblm = $this->notation['nesting_index'][0] . $maxIndiceAnidacion . $this->notation['nesting_index'][1] . implode($this->blocks_separator, $bblm_blocks);
