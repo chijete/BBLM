@@ -2,7 +2,7 @@
 
 #[AllowDynamicProperties]
 class BBLM {
-  function __construct() {
+  function __construct($callTo_setPcreBacktrackLimitWithMaxFileB64Size = true) {
     $this->styles = [
       'ta' => [
         'css' => 'text-align',
@@ -458,13 +458,26 @@ class BBLM {
       'style',
       'script'
     ];
+
+    if ($callTo_setPcreBacktrackLimitWithMaxFileB64Size) {
+      $this->setPcreBacktrackLimitWithMaxFileB64Size();
+    }
+
     return true;
+  }
+
+  // $maxFileSizeInMB = Maximum size in MB of files to be stored in Base64 within the BBLM code
+  public function setPcreBacktrackLimitWithMaxFileB64Size($maxFileSizeInMB = 10) {
+    $maxFileSizeInBytes = $maxFileSizeInMB * 1000000;
+    $maxFileSizeInBytes = (string) $maxFileSizeInBytes + (40/100*$maxFileSizeInBytes);
+    ini_set("pcre.backtrack_limit", $maxFileSizeInBytes);
+    return $maxFileSizeInBytes;
   }
 
   public function BBLMtoHTML($base_string, $delete_breaklines = true, $e_htmlentities = true) {
     $final_html = '';
     if ($delete_breaklines) {
-      $base_string = preg_replace("/[\r\n]/", '', $base_string);
+      $base_string = preg_replace("/[\r|\n|\r\n]/", '', $base_string);
     }
     if ($e_htmlentities) {
       $base_string = htmlentities($base_string, ENT_COMPAT | ENT_HTML401, ini_get("default_charset"), false);
@@ -486,7 +499,7 @@ class BBLM {
     }
 
     $blocks = explode($this->blocks_separator, $base_string);
-    foreach ($blocks as $block) {
+    foreach ($blocks as $blockIndex => $block) {
       $block = trim($block);
       $block_css = [];
       $block = preg_replace_callback('/'.$this->notation['block_styles'][0].'(.*?)'.$this->notation['block_styles'][1].'/', function($coincidence) use (&$block_css) {
@@ -539,16 +552,12 @@ class BBLM {
                         $finalCssPropertyContent = $finalCssPropertyContent . $this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]['str'];
                       }
                     }
+                    if ($allowedValue) {
+                      break;
+                    }
                   }
                 } elseif (in_array($propertyParts[1], $this->styles[$propertyParts[0]]['allowed_values'])) {
                   $allowedValue = true;
-                }
-                if (isset($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'])) {
-                  if ($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'] === 'prefix') {
-                    $finalCssPropertyContent = $this->styles[$propertyParts[0]]['allowed_values_conc']['str'] . $finalCssPropertyContent;
-                  } elseif ($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'] === 'suffix') {
-                    $finalCssPropertyContent = $finalCssPropertyContent . $this->styles[$propertyParts[0]]['allowed_values_conc']['str'];
-                  }
                 }
                 if ($allowedValue) {
                   $block_css[$this->styles[$propertyParts[0]]['css']] = $finalCssPropertyContent;
@@ -638,16 +647,12 @@ class BBLM {
                               $finalCssPropertyContent = $finalCssPropertyContent . $this->styles[$propertyParts[0]]['allowed_values_conc'][$allowedValArrIndex]['str'];
                             }
                           }
+                          if ($allowedValue) {
+                            break;
+                          }
                         }
                       } elseif (in_array($propertyParts[1], $this->styles[$propertyParts[0]]['allowed_values'])) {
                         $allowedValue = true;
-                      }
-                      if (isset($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'])) {
-                        if ($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'] === 'prefix') {
-                          $finalCssPropertyContent = $this->styles[$propertyParts[0]]['allowed_values_conc']['str'] . $finalCssPropertyContent;
-                        } elseif ($this->styles[$propertyParts[0]]['allowed_values_conc']['pos'] === 'suffix') {
-                          $finalCssPropertyContent = $finalCssPropertyContent . $this->styles[$propertyParts[0]]['allowed_values_conc']['str'];
-                        }
                       }
                       if ($allowedValue) {
                         $entity_css[$this->styles[$propertyParts[0]]['css']] = $finalCssPropertyContent;
@@ -703,7 +708,7 @@ class BBLM {
   public function BBLMtoPlainText($base_string, $delete_breaklines = true, $e_htmlentities = true) {
     $final_text = '';
     if ($delete_breaklines) {
-      $base_string = preg_replace("/[\r\n]/", '', $base_string);
+      $base_string = preg_replace("/[\r|\n|\r\n]/", '', $base_string);
     }
     if ($e_htmlentities) {
       $base_string = htmlentities($base_string, ENT_COMPAT | ENT_HTML401, ini_get("default_charset"), false);
