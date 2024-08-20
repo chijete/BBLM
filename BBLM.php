@@ -889,7 +889,9 @@ class BBLM {
           if (!empty($childElementBBLMstart)) {
             $fragmento = $dom->createDocumentFragment();
             $fragmento->appendXML($childElementBBLMstart);
-            $customChildElement->appendChild($fragmento);
+            if ($fragmento->hasChildNodes()) {
+              $customChildElement->appendChild($fragmento);
+            }
           }
         }
         if ($childElement->hasChildNodes()) {
@@ -1079,7 +1081,9 @@ class BBLM {
         if (!empty($elementoInnerHTML)) {
           $fragmento = $dom->createDocumentFragment();
           $fragmento->appendXML($elementoInnerHTML);
-          $customChildElement->appendChild($fragmento);
+          if ($fragmento->hasChildNodes()) {
+            $customChildElement->appendChild($fragmento);
+          }
         }
       }
     }
